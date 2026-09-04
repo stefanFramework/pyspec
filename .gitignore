@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# pyspec: config local de cada repo de specs (puede tener referencias a
+# nombres de variables de entorno; nunca secretos en si, pero no pertenece
+# al codigo fuente de pyspec)
+.pyspec/
+
+# Editores / SO
+.DS_Store
+.vscode/
+.idea/

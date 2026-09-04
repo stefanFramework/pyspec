@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyspec"
+version = "0.1.0"
+description = "Framework de specs multi-repo para trabajar tickets con agentes de codigo (Claude Code, y otros a futuro)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+dependencies = [
+    "typer>=0.12",
+    "click>=8.1",
+    "rich>=13.7",
+    "PyYAML>=6.0",
+    "requests>=2.31",
+]
+
+[project.scripts]
+pyspec = "pyspec.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pyspec"]
