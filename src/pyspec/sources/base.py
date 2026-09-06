@@ -1,4 +1,4 @@
-"""Interfaz comun que implementa cada fuente de tickets (Trello, Shortcut, manual)."""
+"""Common interface implemented by each ticket source (Trello, Shortcut, manual)."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from typing import Protocol
 
 
 class SourceError(RuntimeError):
-    """Error al configurar o consultar una fuente de tickets."""
+    """Error configuring or querying a ticket source."""
 
 
 @dataclass
@@ -22,5 +22,5 @@ class Ticket:
 
 class TicketSource(Protocol):
     def fetch(self, ticket_id: str) -> Ticket:
-        """Trae un ticket normalizado a partir de su id en la fuente configurada."""
+        """Fetches a normalized ticket by its id from the configured source."""
         ...

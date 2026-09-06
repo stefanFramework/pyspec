@@ -17,7 +17,7 @@ class ShortcutSource:
         token = os.environ.get(self.config.token_env, "")
         if not token:
             raise SourceError(
-                f"Falta el token de Shortcut. Defini la variable de entorno "
+                f"Missing Shortcut token. Set the environment variable "
                 f"{self.config.token_env!r}."
             )
         return token
@@ -30,7 +30,7 @@ class ShortcutSource:
             timeout=15,
         )
         if resp.status_code == 404:
-            raise SourceError(f"No encontre la story de Shortcut {ticket_id!r}.")
+            raise SourceError(f"Could not find Shortcut story {ticket_id!r}.")
         resp.raise_for_status()
         data = resp.json()
 

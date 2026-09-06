@@ -1,26 +1,26 @@
 ---
-description: Genera el spec de un ticket (contexto + plan) y frena para pedir aprobacion antes de tocar codigo.
+description: Generates a ticket's spec (context + plan) and stops to ask for approval before touching code.
 argument-hint: <ticket-id>
 ---
 
-Estas armando el spec del ticket `$ARGUMENTS` para el framework pyspec.
+You're writing the spec for ticket `$ARGUMENTS` for the pyspec framework.
 
-1. Corre `pyspec fetch $ARGUMENTS` para traer el ticket (titulo, descripcion, url).
-2. Identifica el/los modulo(s) del sistema que toca este ticket.
-3. Lee `specs/current/<modulo>.md` para cada modulo relevante. Si no existe
-   todavia, generalo primero leyendo el codigo actual (no inventes nada que
-   no este en el codigo). Los repos configurados son:
+1. Run `pyspec fetch $ARGUMENTS` to fetch the ticket (title, description, url).
+2. Identify the module(s) of the system this ticket touches.
+3. Read `specs/current/<module>.md` for each relevant module. If it doesn't
+   exist yet, generate it first by reading the current code (don't invent
+   anything that isn't in the code). The configured repos are:
    - backend: $repo_backend
    - frontend: $repo_frontend
    - infra: $repo_infra
-4. Lee el codigo de backend/frontend/infra relevante al pedido del ticket.
-5. Corre `pyspec new $ARGUMENTS --title "<titulo del ticket>"` para crear
-   `specs/active/sc-$ARGUMENTS.spec` desde la plantilla.
-6. Completa el spec con:
-   - Contexto actual (resumen de lo que dice `current/`)
-   - Plan de implementacion paso a paso
-   - Archivos a tocar (backend, frontend, infra segun aplique)
-   - Justificacion de decisiones tecnicas especificas del ticket
+4. Read the backend/frontend/infra code relevant to the ticket's request.
+5. Run `pyspec new $ARGUMENTS --title "<ticket title>"` to create
+   `specs/active/sc-$ARGUMENTS.spec` from the template.
+6. Fill in the spec with:
+   - Current context (summary of what `current/` says)
+   - Step-by-step implementation plan
+   - Files to touch (backend, frontend, infra as applicable)
+   - Justification for ticket-specific technical decisions
 
-IMPORTANTE: no empieces a implementar. Cuando termines el spec, mostraselo
-al usuario y pregunta explicitamente si esta aprobado antes de tocar codigo.
+IMPORTANT: do not start implementing. Once the spec is done, show it to
+the user and explicitly ask whether it's approved before touching code.

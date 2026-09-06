@@ -1,17 +1,17 @@
 ---
-description: Implementa un ticket siguiendo el spec ya aprobado en specs/active/.
+description: Implements a ticket following the already-approved spec in specs/active/.
 argument-hint: <ticket-id>
 ---
 
-Vas a implementar el ticket `$ARGUMENTS` siguiendo su spec.
+You're going to implement ticket `$ARGUMENTS` following its spec.
 
-1. Lee `specs/active/sc-$ARGUMENTS.spec` completo. Si no existe, avisa y
-   sugiere correr `/pyspec-explore $ARGUMENTS` primero.
-2. Implementa el plan paso a paso, tocando los archivos listados en
-   "Archivos a tocar" (backend: $repo_backend, frontend: $repo_frontend,
+1. Read `specs/active/sc-$ARGUMENTS.spec` in full. If it doesn't exist,
+   say so and suggest running `/pyspec-explore $ARGUMENTS` first.
+2. Implement the plan step by step, touching the files listed under
+   "Files to touch" (backend: $repo_backend, frontend: $repo_frontend,
    infra: $repo_infra).
-3. Si durante la implementacion el alcance cambia respecto del plan
-   original, actualiza el spec (`specs/active/sc-$ARGUMENTS.spec`) para que
-   siga siendo la fuente de verdad de lo que se hizo y por que.
-4. No archives el ticket vos mismo: eso lo hace `/pyspec-verify` y
-   `/pyspec-archive` una vez confirmada la implementacion.
+3. If the scope changes from the original plan during implementation,
+   update the spec (`specs/active/sc-$ARGUMENTS.spec`) so it stays the
+   source of truth for what was done and why.
+4. Don't archive the ticket yourself: that's done by `/pyspec-verify` and
+   `/pyspec-archive` once the implementation is confirmed.

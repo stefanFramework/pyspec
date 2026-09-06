@@ -1,18 +1,18 @@
 # Ticket $ticket_id: $title
 
-## Fuente
+## Source
 $url
 
-## Contexto actual (de current/$modulo.md)
-<resumen de como funciona hoy la parte del sistema que este ticket toca>
+## Current context (from current/$modulo.md)
+<summary of how the part of the system this ticket touches works today>
 
 ## Plan
 1. ...
 
-## Archivos a tocar
+## Files to touch
 - backend/...
 - frontend/...
-- infra/... (si aplica)
+- infra/... (if applicable)
 
-## Decisiones tecnicas y justificacion
-<por que se eligio este approach, alternativas descartadas si las hubo>
+## Technical decisions and justification
+<why this approach was chosen, alternatives discarded if any>

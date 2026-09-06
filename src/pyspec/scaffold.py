@@ -1,4 +1,4 @@
-"""Manejo de la estructura specs/current, specs/active, specs/archive."""
+"""Management of the specs/current, specs/active, specs/archive structure."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ def specs_root(config: PyspecConfig) -> Path:
 
 
 def ensure_structure(config: PyspecConfig) -> list[Path]:
-    """Crea specs/current, specs/active, specs/archive si no existen."""
+    """Creates specs/current, specs/active, specs/archive if they don't exist."""
     created: list[Path] = []
     root = specs_root(config)
     for name in SPECS_DIRS:
@@ -60,7 +60,7 @@ def new_active_spec(
     path = active_spec_path(config, ticket.id)
     if path.exists() and not overwrite:
         raise SpecError(
-            f"Ya existe {path}. Pasa --overwrite si queres regenerarlo."
+            f"{path} already exists. Pass --overwrite if you want to regenerate it."
         )
 
     template = _read_template("spec_template.md")
@@ -90,7 +90,7 @@ def new_current_module(config: PyspecConfig, modulo: str) -> Path:
 def move_to_archive(config: PyspecConfig, ticket_id: str) -> Path:
     src = active_spec_path(config, ticket_id)
     if not src.exists():
-        raise SpecError(f"No encontre {src}. ¿El ticket esta activo?")
+        raise SpecError(f"Could not find {src}. Is the ticket active?")
 
     dst = archive_spec_path(config, ticket_id)
     dst.parent.mkdir(parents=True, exist_ok=True)

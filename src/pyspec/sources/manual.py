@@ -6,11 +6,11 @@ from pyspec.sources.base import Ticket
 
 
 class ManualSource:
-    """Fuente sin integracion: pide el titulo y la descripcion del ticket por consola."""
+    """No-integration source: asks for the ticket's title and description on the console."""
 
     def fetch(self, ticket_id: str) -> Ticket:
-        title = typer.prompt(f"Titulo del ticket {ticket_id}")
-        typer.echo("Descripcion del ticket (linea vacia para terminar):")
+        title = typer.prompt(f"Title for ticket {ticket_id}")
+        typer.echo("Ticket description (empty line to finish):")
         lines: list[str] = []
         while True:
             line = input()

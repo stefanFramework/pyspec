@@ -1,19 +1,19 @@
 ---
-description: Compara el spec activo contra el diff real antes de dar el ticket por cerrado.
+description: Compares the active spec against the actual diff before considering the ticket closed.
 argument-hint: <ticket-id>
 ---
 
-Vas a verificar el ticket `$ARGUMENTS` antes de archivarlo.
+You're going to verify ticket `$ARGUMENTS` before archiving it.
 
-1. Lee `specs/active/sc-$ARGUMENTS.spec` completo, en particular el "Plan"
-   y "Archivos a tocar".
-2. Revisa el diff real (`git diff` / archivos modificados) en los repos
-   tocados (backend: $repo_backend, frontend: $repo_frontend,
+1. Read `specs/active/sc-$ARGUMENTS.spec` in full, in particular the
+   "Plan" and "Files to touch" sections.
+2. Review the actual diff (`git diff` / modified files) in the touched
+   repos (backend: $repo_backend, frontend: $repo_frontend,
    infra: $repo_infra).
-3. Compara plan vs diff real y reporta:
-   - Que del plan se implemento tal cual.
-   - Que quedo a mitad de camino o no se hizo.
-   - Que se hizo pero no estaba en el plan original (y si el spec se
-     actualizo para reflejarlo).
-4. No modifiques codigo en este paso, solo reporta. Si encontras algo
-   pendiente, decilo explicitamente antes de sugerir `/pyspec-archive`.
+3. Compare the plan against the actual diff and report:
+   - What from the plan was implemented as-is.
+   - What was left half-done or not done at all.
+   - What was done but wasn't in the original plan (and whether the spec
+     was updated to reflect it).
+4. Don't modify code in this step, only report. If you find something
+   pending, say so explicitly before suggesting `/pyspec-archive`.

@@ -1,16 +1,16 @@
 ---
-description: Actualiza current/ con lo que efectivamente se implemento y mueve el spec a archive/.
+description: Updates current/ with what was actually implemented and moves the spec to archive/.
 argument-hint: <ticket-id>
 ---
 
-Vas a cerrar el ticket `$ARGUMENTS`.
+You're going to close ticket `$ARGUMENTS`.
 
-1. Lee `specs/active/sc-$ARGUMENTS.spec` y el codigo final implementado
-   (no lo planeado, lo que efectivamente quedo).
-2. Actualiza `specs/current/<modulo>.md` de cada modulo tocado reflejando
-   los cambios reales, agregando la referencia `[sc-$ARGUMENTS]` a cada
-   linea nueva o modificada.
-3. Corre `pyspec archive $ARGUMENTS` para mover
-   `specs/active/sc-$ARGUMENTS.spec` a `specs/archive/sc-$ARGUMENTS.spec`.
-4. Confirma al usuario que modulo(s) quedaron actualizados y que el spec
-   se archivo correctamente.
+1. Read `specs/active/sc-$ARGUMENTS.spec` and the final implemented code
+   (not what was planned, what actually ended up there).
+2. Update `specs/current/<module>.md` for each touched module to reflect
+   the real changes, adding the `[sc-$ARGUMENTS]` reference to every new
+   or modified line.
+3. Run `pyspec archive $ARGUMENTS` to move
+   `specs/active/sc-$ARGUMENTS.spec` to `specs/archive/sc-$ARGUMENTS.spec`.
+4. Confirm to the user which module(s) were updated and that the spec was
+   successfully archived.

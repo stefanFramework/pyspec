@@ -14,7 +14,7 @@ __all__ = [
 
 
 def get_source(config):
-    """Devuelve la instancia de fuente de tickets configurada en pyspec.config.PyspecConfig."""
+    """Returns the ticket source instance configured in pyspec.config.PyspecConfig."""
     ds = config.data_source
     if ds.type == "trello":
         return TrelloSource(ds.trello)
@@ -22,4 +22,4 @@ def get_source(config):
         return ShortcutSource(ds.shortcut)
     if ds.type == "manual":
         return ManualSource()
-    raise SourceError(f"Fuente de datos desconocida: {ds.type!r}")
+    raise SourceError(f"Unknown data source: {ds.type!r}")

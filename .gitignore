@@ -11,12 +11,12 @@ venv/
 .mypy_cache/
 .ruff_cache/
 
-# pyspec: config local de cada repo de specs (puede tener referencias a
-# nombres de variables de entorno; nunca secretos en si, pero no pertenece
-# al codigo fuente de pyspec)
+# pyspec: local config for each specs repo (may reference environment
+# variable names; never secrets themselves, but doesn't belong in
+# pyspec's own source code)
 .pyspec/
 
-# Editores / SO
+# Editors / OS
 .DS_Store
 .vscode/
 .idea/

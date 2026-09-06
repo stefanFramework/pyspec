@@ -1,9 +1,9 @@
-# Modulo $modulo
+# Module $modulo
 
-## <seccion funcional, ej. "Alta de cliente">
-- <comportamiento vigente>
-- <regla de negocio> [sc-XXXX]
-- <estructura de datos relevante> [sc-XXXX]
+## <functional section, e.g. "Customer signup">
+- <current behavior>
+- <business rule> [sc-XXXX]
+- <relevant data structure> [sc-XXXX]
 
-## Contratos tecnicos
-- <endpoints, formatos, dependencias de otros modulos>
+## Technical contracts
+- <endpoints, formats, dependencies on other modules>

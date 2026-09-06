@@ -23,7 +23,7 @@ from pyspec.sources import SourceError, get_source
 
 app = typer.Typer(
     add_completion=False,
-    help="pyspec: framework de specs multi-repo para trabajar tickets con agentes de codigo.",
+    help="pyspec: a specs framework for working tickets with coding agents.",
 )
 console = Console()
 err_console = Console(stderr=True, style="bold red")
@@ -40,15 +40,15 @@ def _load_or_exit() -> PyspecConfig:
 @app.command()
 def init(
     path: Path = typer.Option(
-        Path.cwd(), "--path", help="Raiz del repo de specs (por defecto, el directorio actual)."
+        Path.cwd(), "--path", help="Root of the specs repo (defaults to the current directory)."
     ),
 ) -> None:
-    """Configura pyspec en este repo: fuente de datos, repos del equipo y comandos de Claude Code."""
+    """Configures pyspec in this repo: data source, team repos, and Claude Code commands."""
     specs_root = path.resolve()
-    console.print(f"[bold]Inicializando pyspec en[/bold] {specs_root}\n")
+    console.print(f"[bold]Initializing pyspec in[/bold] {specs_root}\n")
 
     source_type = typer.prompt(
-        "Fuente de datos de tickets",
+        "Ticket data source",
         type=click.Choice(SUPPORTED_SOURCES),
         default="manual",
     )
@@ -58,28 +58,28 @@ def init(
 
     if source_type == "trello":
         console.print(
-            "\nTrello se lee via API. Necesitas dos variables de entorno con "
-            "tu API key y tu token (https://trello.com/power-ups/admin)."
+            "\nTrello is read via API. You need two environment variables with "
+            "your API key and token (https://trello.com/power-ups/admin)."
         )
         trello.api_key_env = typer.prompt(
-            "Nombre de la variable de entorno con la API key", default=trello.api_key_env
+            "Environment variable name for the API key", default=trello.api_key_env
         )
         trello.token_env = typer.prompt(
-            "Nombre de la variable de entorno con el token", default=trello.token_env
+            "Environment variable name for the token", default=trello.token_env
         )
-        trello.board_id = typer.prompt("Board id (opcional)", default="", show_default=False)
+        trello.board_id = typer.prompt("Board id (optional)", default="", show_default=False)
     elif source_type == "shortcut":
         console.print(
-            "\nShortcut se lee via API. Necesitas una variable de entorno con tu token "
+            "\nShortcut is read via API. You need an environment variable with your token "
             "(https://app.shortcut.com/settings/account/api-tokens)."
         )
         shortcut.token_env = typer.prompt(
-            "Nombre de la variable de entorno con el token", default=shortcut.token_env
+            "Environment variable name for the token", default=shortcut.token_env
         )
     else:
-        console.print("\nSin integracion: vas a pegar titulo y descripcion a mano en cada ticket.")
+        console.print("\nNo integration: you'll paste the title and description by hand for each ticket.")
 
-    console.print("\n[bold]Repos del equipo[/bold] (ruta relativa a este repo de specs, dejar vacio si no aplica):")
+    console.print("\n[bold]Team repos[/bold] (path relative to this specs repo, leave empty if not applicable):")
     repos = {}
     for name in ("backend", "frontend", "infra"):
         value = typer.prompt(f"  {name}", default="", show_default=False)
@@ -87,7 +87,7 @@ def init(
             repos[name] = value
 
     agent = typer.prompt(
-        "\nAgente de codigo a usar",
+        "\nCoding agent to use",
         type=click.Choice(SUPPORTED_AGENTS),
         default="claude-code",
     )
@@ -99,29 +99,29 @@ def init(
         agent=agent,
     )
     config.save()
-    console.print(f"\n[green]OK[/green] Config guardada en {config.config_path}")
+    console.print(f"\n[green]OK[/green] Config saved to {config.config_path}")
 
     created = scaffold.ensure_structure(config)
     if created:
-        console.print(f"[green]OK[/green] Estructura creada: {', '.join(p.name for p in created)}")
+        console.print(f"[green]OK[/green] Structure created: {', '.join(p.name for p in created)}")
     else:
-        console.print("[dim]La estructura specs/current, active, archive ya existia.[/dim]")
+        console.print("[dim]The specs/current, active, archive structure already existed.[/dim]")
 
     if agent == "claude-code":
         written = claude_code.install(config)
-        console.print(f"[green]OK[/green] Comandos de Claude Code generados en .claude/commands/:")
+        console.print(f"[green]OK[/green] Claude Code commands generated in .claude/commands/:")
         for p in written:
             console.print(f"  - /{p.stem}")
 
     console.print(
-        "\n[bold]Listo.[/bold] Proximo paso: en Claude Code, corre "
-        "[cyan]/pyspec-explore <ticket-id>[/cyan] para arrancar un ticket."
+        "\n[bold]Done.[/bold] Next step: in Claude Code, run "
+        "[cyan]/pyspec-explore <ticket-id>[/cyan] to start a ticket."
     )
 
 
 @app.command()
 def fetch(ticket_id: str) -> None:
-    """Trae un ticket normalizado desde la fuente configurada y lo imprime."""
+    """Fetches a normalized ticket from the configured source and prints it."""
     config = _load_or_exit()
     try:
         source = get_source(config)
@@ -142,11 +142,11 @@ def fetch(ticket_id: str) -> None:
 @app.command()
 def new(
     ticket_id: str,
-    title: str = typer.Option("", "--title", help="Titulo del ticket (si no se pasa, se busca en la fuente configurada)."),
-    modulo: str = typer.Option("<modulo>", "--modulo", help="Modulo/dominio principal que toca el ticket."),
-    overwrite: bool = typer.Option(False, "--overwrite", help="Sobreescribir el spec activo si ya existe."),
+    title: str = typer.Option("", "--title", help="Ticket title (if not passed, it's fetched from the configured source)."),
+    modulo: str = typer.Option("<modulo>", "--modulo", help="Main module/domain the ticket touches."),
+    overwrite: bool = typer.Option(False, "--overwrite", help="Overwrite the active spec if it already exists."),
 ) -> None:
-    """Crea specs/active/sc-<id>.spec desde la plantilla."""
+    """Creates specs/active/sc-<id>.spec from the template."""
     config = _load_or_exit()
 
     if title:
@@ -167,36 +167,36 @@ def new(
         err_console.print(str(exc))
         raise typer.Exit(code=1) from exc
 
-    console.print(f"[green]OK[/green] Spec creado en {path}")
+    console.print(f"[green]OK[/green] Spec created at {path}")
 
 
 @app.command()
 def archive(ticket_id: str) -> None:
-    """Mueve specs/active/sc-<id>.spec a specs/archive/."""
+    """Moves specs/active/sc-<id>.spec to specs/archive/."""
     config = _load_or_exit()
     try:
         dst = scaffold.move_to_archive(config, ticket_id)
     except scaffold.SpecError as exc:
         err_console.print(str(exc))
         raise typer.Exit(code=1) from exc
-    console.print(f"[green]OK[/green] Spec archivado en {dst}")
+    console.print(f"[green]OK[/green] Spec archived at {dst}")
 
 
 @app.command()
 def status() -> None:
-    """Lista tickets activos y modulos documentados en current/."""
+    """Lists active tickets and documented modules in current/."""
     config = _load_or_exit()
 
     active = scaffold.list_active(config)
-    table = Table(title="Tickets activos")
+    table = Table(title="Active tickets")
     table.add_column("Ticket")
-    table.add_column("Archivo")
+    table.add_column("File")
     for path in active:
         table.add_row(path.stem.removeprefix("sc-"), str(path))
     console.print(table)
 
     modules = scaffold.list_current_modules(config)
-    console.print(f"\n[bold]Modulos documentados en current/:[/bold] {len(modules)}")
+    console.print(f"\n[bold]Modules documented in current/:[/bold] {len(modules)}")
     for path in modules:
         console.print(f"  - {path.stem}")
 

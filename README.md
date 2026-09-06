@@ -1,113 +1,123 @@
 # pyspec
 
-Framework de specs multi-repo para trabajar tickets con agentes de codigo
-(Claude Code por ahora; otros agentes a futuro).
+A specs framework for working tickets with coding agents (Claude Code for
+now; other agents later). Works both for multi-repo setups (backend,
+frontend, infra in separate repos) and for a single repo.
 
-## Que problema resuelve
+## What problem it solves
 
-Cuando un ticket toca varios repos (backend, frontend, infra), es facil que
-un agente de codigo pierda contexto: no sabe como funciona el sistema hoy,
-no deja rastro de por que tomo una decision, y es dificil verificar despues
-si implemento todo lo que dijo que iba a implementar.
+When a ticket touches code the agent has no memory of — whether because
+it lives in another repo, or simply because time passed since that part of
+the system was last touched — it's easy for a coding agent to lose
+context: it doesn't know how the system works today, it leaves no trace of
+why it made a decision, and it's hard to verify afterwards whether it
+actually implemented what it said it would. This shows up more the more
+repos a ticket touches, but it happens in a single repo too.
 
-pyspec estandariza eso con tres carpetas versionadas en un repo de specs
-propio (separado de backend/frontend/infra):
+pyspec standardizes this with three versioned folders (in a dedicated
+specs repo if you work multi-repo, or inside the project's own repo if
+it's just one):
 
 ```
 specs/
-├── current/   # Estado ACTUAL del sistema, un archivo por modulo. Vivo,
-│              # se actualiza siempre, nunca se archiva.
-├── active/    # Un .spec por ticket EN CURSO: contexto + plan + archivos
-│              # a tocar + justificacion tecnica.
-└── archive/   # Specs de tickets ya cerrados. Registro historico de "por
-               # que existe esta regla/columna/decision".
+├── current/   # ACTUAL state of the system, one file per module. Alive,
+│              # always kept up to date, never archived.
+├── active/    # One .spec per ticket IN PROGRESS: context + plan + files
+│              # to touch + technical justification.
+└── archive/   # Specs of closed tickets. Historical record of "why does
+               # this rule/column/decision exist".
 ```
 
-La regla para decidir donde va cada cosa: si todavia se esta decidiendo o
-justificando, vive en `active/` mientras dura el ticket. Si es un hecho
-consumado que cualquier ticket futuro necesita conocer, se consolida en
-`current/<modulo>.md`, con una referencia `[sc-<id>]` al ticket de origen.
+The rule for deciding where something goes: if it's still being decided
+or justified, it lives in `active/` for the duration of the ticket. Once
+it's a settled fact that any future ticket needs to know, it gets
+consolidated into `current/<module>.md`, with a `[sc-<id>]` reference back
+to the originating ticket.
 
-## Que hace pyspec (la herramienta) y que hace el agente
+## What pyspec (the tool) does vs. what the agent does
 
-pyspec es deliberadamente una capa fina: fetch de tickets, scaffolding de
-archivos y movimiento active → archive. Todo lo que requiere criterio
-—leer codigo, redactar el plan, decidir que va en `current/`— lo hace el
-agente de codigo (Claude Code), no pyspec.
+pyspec is deliberately a thin layer: fetching tickets, scaffolding files,
+and moving active → archive. Everything that requires judgment — reading
+code, writing the plan, deciding what goes into `current/` — is done by
+the coding agent (Claude Code), not pyspec.
 
-| pyspec (CLI)              | Agente (Claude Code)                          |
-|----------------------------|-----------------------------------------------|
-| Config de fuente de datos | Lee `current/` y el codigo relevante          |
-| Fetch normalizado del ticket | Redacta el plan y las decisiones tecnicas  |
-| Crea `active/sc-<id>.spec` desde plantilla | Completa el contenido del spec |
-| Mueve `active/` → `archive/` | Decide cuando el ticket esta listo para cerrar, actualiza `current/` |
+| pyspec (CLI)                 | Agent (Claude Code)                                   |
+|-------------------------------|-------------------------------------------------------|
+| Data source config            | Reads `current/` and the relevant code                |
+| Normalized ticket fetch        | Writes the plan and the technical decisions           |
+| Creates `active/sc-<id>.spec` from a template | Fills in the spec's content            |
+| Moves `active/` → `archive/`  | Decides when a ticket is ready to close, updates `current/` |
 
-## Instalacion
+## Install
 
 ```bash
 pip install -e .
 ```
 
-(Publicacion en PyPI: pendiente.)
+(PyPI publishing: pending.)
 
-## Uso
+## Usage
 
-En la raiz del repo de specs de tu equipo:
+From the root of your team's specs repo (multi-repo) or the root of the
+project (single repo):
 
 ```bash
 pyspec init
 ```
 
-Te pregunta:
+It asks you for:
 
-- **Fuente de datos de tickets**: `trello`, `shortcut` o `manual` (pegar el
-  texto del ticket a mano). Para Trello/Shortcut, pyspec no guarda
-  credenciales en el config — solo el *nombre* de las variables de entorno
-  donde las vas a poner (ej. `TRELLO_API_KEY`, `TRELLO_TOKEN`).
-- **Rutas de los repos** del equipo (backend, frontend, infra), relativas
-  al repo de specs.
-- **Agente de codigo**: por ahora solo `claude-code`.
+- **Ticket data source**: `trello`, `shortcut` or `manual` (paste the
+  ticket text by hand). For Trello/Shortcut, pyspec never stores
+  credentials in the config — only the *name* of the environment
+  variables you'll set them in (e.g. `TRELLO_API_KEY`, `TRELLO_TOKEN`).
+- **Repo paths** for the team (backend, frontend, infra), relative to the
+  specs repo. These are optional: for a single-repo setup, leave them
+  empty or fill in just one (e.g. `backend: .`) — they're only used to
+  parametrize the Claude Code commands, they don't change the rest of
+  pyspec's behavior.
+- **Coding agent**: only `claude-code` for now.
 
-Esto genera:
+This generates:
 
-- `.pyspec/config.yaml` con la config (no se versiona, ver `.gitignore`).
+- `.pyspec/config.yaml` with the config (not versioned, see `.gitignore`).
 - `specs/current/`, `specs/active/`, `specs/archive/`.
 - `.claude/commands/pyspec-explore.md`, `pyspec-execute.md`,
-  `pyspec-verify.md`, `pyspec-archive.md` — comandos de Claude Code
-  parametrizados con las rutas de tus repos.
+  `pyspec-verify.md`, `pyspec-archive.md` — Claude Code commands
+  parametrized with your repo paths.
 
-### Workflow de un ticket
+### Ticket workflow
 
-1. `/pyspec-explore <id>` — Claude Code lee el ticket, lee `current/` y el
-   codigo, y arma `specs/active/sc-<id>.spec`. Se frena y pide aprobacion
-   explicita antes de tocar codigo.
-2. `/pyspec-execute <id>` — implementa siguiendo el spec aprobado.
-3. `/pyspec-verify <id>` — compara el spec contra el diff real antes de
-   dar el ticket por cerrado.
-4. `/pyspec-archive <id>` — actualiza `specs/current/<modulo>.md` con lo
-   que efectivamente quedo implementado (agregando `[sc-<id>]` a cada
-   linea nueva o modificada) y mueve el spec a `archive/`.
+1. `/pyspec-explore <id>` — Claude Code reads the ticket, reads
+   `current/` and the code, and writes `specs/active/sc-<id>.spec`. It
+   stops and explicitly asks for approval before touching any code.
+2. `/pyspec-execute <id>` — implements the approved spec.
+3. `/pyspec-verify <id>` — compares the spec against the actual diff
+   before the ticket is considered done.
+4. `/pyspec-archive <id>` — updates `specs/current/<module>.md` with what
+   was actually implemented (adding `[sc-<id>]` to every new or modified
+   line) and moves the spec to `archive/`.
 
-### Comandos de la CLI
+### CLI commands
 
 ```bash
-pyspec init                          # configura este repo de specs
-pyspec fetch <ticket-id>             # trae un ticket normalizado y lo imprime
-pyspec new <ticket-id> [--modulo x]  # crea specs/active/sc-<id>.spec desde la plantilla
-pyspec archive <ticket-id>           # mueve active/sc-<id>.spec a archive/
-pyspec status                        # lista tickets activos y modulos documentados
+pyspec init                          # configure this specs repo
+pyspec fetch <ticket-id>             # fetch a normalized ticket and print it
+pyspec new <ticket-id> [--modulo x]  # create specs/active/sc-<id>.spec from the template
+pyspec archive <ticket-id>           # move active/sc-<id>.spec to archive/
+pyspec status                        # list active tickets and documented modules
 ```
 
-## Setup multi-repo
+## Multi-repo setup
 
-El repo de specs es independiente de backend/frontend/infra — no vive
-dentro de ninguno, para no elegir arbitrariamente donde meterlo cuando un
-ticket toca varios repos. Para trabajar, todos los repos necesarios deben
-estar accesibles en la misma sesion de Claude Code (clonados uno al lado
-del otro, o sumando el repo de specs con `/add-dir`).
+The specs repo is independent from backend/frontend/infra — it doesn't
+live inside any of them, so you don't have to arbitrarily pick one when a
+ticket touches several repos. To work, all the repos a ticket needs must
+be accessible in the same Claude Code session (cloned side by side, or
+adding the specs repo with `/add-dir`).
 
-## Estado del proyecto
+## Project status
 
-Primera implementacion. Soporta Claude Code como unico agente; el diseño
-deja lugar para sumar otros (ej. Codex) como un adapter nuevo en
-`pyspec/adapters/`, sin tocar la logica de fetch/scaffold/archive.
+First implementation. Supports Claude Code as the only agent; the design
+leaves room to add others (e.g. Codex) as a new adapter under
+`pyspec/adapters/`, without touching the fetch/scaffold/archive logic.

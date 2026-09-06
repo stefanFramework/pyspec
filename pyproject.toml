@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pyspec"
 version = "0.1.0"
-description = "Framework de specs multi-repo para trabajar tickets con agentes de codigo (Claude Code, y otros a futuro)."
+description = "A specs framework for working tickets with coding agents (Claude Code, and others later)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Proprietary" }

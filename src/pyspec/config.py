@@ -1,4 +1,4 @@
-"""Carga y guardado de la configuracion de pyspec (.pyspec/config.yaml)."""
+"""Loading and saving pyspec's config (.pyspec/config.yaml)."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ SUPPORTED_AGENTS = ("claude-code",)
 
 
 class ConfigNotFoundError(RuntimeError):
-    """No se encontro .pyspec/config.yaml en el directorio actual ni en sus padres."""
+    """.pyspec/config.yaml was not found in the current directory or any parent."""
 
 
 @dataclass
@@ -99,14 +99,14 @@ class PyspecConfig:
 
 
 def find_config(start: Path | None = None) -> Path:
-    """Busca .pyspec/config.yaml en start (o cwd) y sus directorios padres."""
+    """Looks for .pyspec/config.yaml in start (or cwd) and its parent directories."""
     current = (start or Path.cwd()).resolve()
     for directory in (current, *current.parents):
         candidate = directory / CONFIG_DIRNAME / CONFIG_FILENAME
         if candidate.exists():
             return candidate
     raise ConfigNotFoundError(
-        "No encontre .pyspec/config.yaml. Corre 'pyspec init' primero en la raiz del repo de specs."
+        "Could not find .pyspec/config.yaml. Run 'pyspec init' first at the root of your specs repo."
     )
 
 
