@@ -5,7 +5,16 @@ argument-hint: <ticket-id>
 
 You're writing the spec for ticket `$ARGUMENTS` for the pyspec framework.
 
-1. Run `pyspec fetch $ARGUMENTS` to fetch the ticket (title, description, url).
+Configured ticket data source: `$data_source`.
+
+1. Get the ticket's title and description. `$ARGUMENTS` here is just the
+   ticket id (it's reused as-is in `specs/active/sc-$ARGUMENTS.spec` later).
+   - If the data source is `manual`: don't run `pyspec fetch` — it expects an
+     interactive terminal (it prompts for title/description line by line) and
+     will hang when run from here. Instead, ask the user directly in this
+     conversation for the ticket's title and description before continuing.
+   - If the data source is `trello` or `shortcut`: run `pyspec fetch $ARGUMENTS`
+     to fetch the ticket (title, description, url) automatically.
 2. Identify the module(s) of the system this ticket touches.
 3. Read `specs/current/<module>.md` for each relevant module. If it doesn't
    exist yet, generate it first by reading the current code (don't invent

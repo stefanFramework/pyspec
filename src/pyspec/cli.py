@@ -120,6 +120,23 @@ def init(
 
 
 @app.command()
+def upgrade() -> None:
+    """Re-generates the Claude Code commands from the installed pyspec templates,
+    without touching .pyspec/config.yaml or specs/. Run this after updating the
+    pyspec package to pick up template fixes/changes in an already-initialized repo."""
+    config = _load_or_exit()
+
+    if config.agent != "claude-code":
+        console.print(f"[dim]Agent '{config.agent}' has no generated commands to upgrade.[/dim]")
+        raise typer.Exit(code=0)
+
+    written = claude_code.install(config)
+    console.print("[green]OK[/green] Commands regenerated in .claude/commands/:")
+    for p in written:
+        console.print(f"  - /{p.stem}")
+
+
+@app.command()
 def fetch(ticket_id: str) -> None:
     """Fetches a normalized ticket from the configured source and prints it."""
     config = _load_or_exit()

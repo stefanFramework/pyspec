@@ -17,6 +17,7 @@ def _render(template_text: str, config: PyspecConfig) -> str:
         "repo_backend": config.repos.get("backend") or "(not configured)",
         "repo_frontend": config.repos.get("frontend") or "(not configured)",
         "repo_infra": config.repos.get("infra") or "(not configured)",
+        "data_source": config.data_source.type,
     }
     return string.Template(template_text).safe_substitute(mapping)
 
