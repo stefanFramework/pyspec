@@ -1,4 +1,4 @@
-"""Generates the Claude Code commands (/pyspec-explore, execute, verify, archive)
+"""Generates the Claude Code commands (/pyspec:explore, execute, verify, archive)
 from the packaged templates, parametrized with the repo's config."""
 
 from __future__ import annotations
@@ -23,16 +23,29 @@ def _render(template_text: str, config: PyspecConfig) -> str:
 
 
 def install(config: PyspecConfig) -> list[Path]:
-    """Writes .claude/commands/pyspec-*.md under specs_root. Returns the created paths."""
+    """Writes .claude/commands/pyspec/*.md under specs_root (rendered as /pyspec:name
+    commands by Claude Code's directory-based namespacing). Returns the created paths."""
     commands_dir = config.specs_root / ".claude" / "commands"
-    commands_dir.mkdir(parents=True, exist_ok=True)
+    namespace_dir = commands_dir / "pyspec"
+    namespace_dir.mkdir(parents=True, exist_ok=True)
+
+    _remove_legacy_flat_commands(commands_dir)
 
     templates_root = resources.files("pyspec.templates.claude_commands")
     written: list[Path] = []
     for name in COMMAND_NAMES:
         template_text = (templates_root / f"{name}.md").read_text(encoding="utf-8")
         rendered = _render(template_text, config)
-        out_path = commands_dir / f"pyspec-{name}.md"
+        out_path = namespace_dir / f"{name}.md"
         out_path.write_text(rendered, encoding="utf-8")
         written.append(out_path)
     return written
+
+
+def _remove_legacy_flat_commands(commands_dir: Path) -> None:
+    """Removes .claude/commands/pyspec-*.md left over from before the /pyspec:name
+    namespacing (moved to .claude/commands/pyspec/*.md)."""
+    for name in COMMAND_NAMES:
+        legacy_path = commands_dir / f"pyspec-{name}.md"
+        if legacy_path.exists():
+            legacy_path.unlink()

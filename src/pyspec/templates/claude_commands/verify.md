@@ -16,4 +16,4 @@ You're going to verify ticket `$ARGUMENTS` before archiving it.
    - What was done but wasn't in the original plan (and whether the spec
      was updated to reflect it).
 4. Don't modify code in this step, only report. If you find something
-   pending, say so explicitly before suggesting `/pyspec-archive`.
+   pending, say so explicitly before suggesting `/pyspec:archive`.

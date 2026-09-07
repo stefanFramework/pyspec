@@ -127,11 +127,11 @@ def init(
         written = claude_code.install(config)
         console.print(f"[green]OK[/green] Claude Code commands generated in .claude/commands/:")
         for p in written:
-            console.print(f"  - /{p.stem}")
+            console.print(f"  - /pyspec:{p.stem}")
 
     console.print(
         "\n[bold]Done.[/bold] Next step: in Claude Code, run "
-        "[cyan]/pyspec-explore <ticket-id>[/cyan] to start a ticket."
+        "[cyan]/pyspec:explore <ticket-id>[/cyan] to start a ticket."
     )
 
 
@@ -149,7 +149,7 @@ def upgrade() -> None:
     written = claude_code.install(config)
     console.print("[green]OK[/green] Commands regenerated in .claude/commands/:")
     for p in written:
-        console.print(f"  - /{p.stem}")
+        console.print(f"  - /pyspec:{p.stem}")
 
 
 @app.command()

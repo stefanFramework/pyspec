@@ -82,19 +82,20 @@ This generates:
 
 - `.pyspec/config.yaml` with the config (not versioned, see `.gitignore`).
 - `specs/current/`, `specs/active/`, `specs/archive/`.
-- `.claude/commands/pyspec-explore.md`, `pyspec-execute.md`,
-  `pyspec-verify.md`, `pyspec-archive.md` — Claude Code commands
-  parametrized with your repo paths.
+- `.claude/commands/pyspec/explore.md`, `execute.md`, `verify.md`,
+  `archive.md` — Claude Code commands parametrized with your repo
+  paths, exposed as `/pyspec:explore`, `/pyspec:execute`,
+  `/pyspec:verify`, `/pyspec:archive` (directory-based namespacing).
 
 ### Ticket workflow
 
-1. `/pyspec-explore <id>` — Claude Code reads the ticket, reads
+1. `/pyspec:explore <id>` — Claude Code reads the ticket, reads
    `current/` and the code, and writes `specs/active/sc-<id>.spec`. It
    stops and explicitly asks for approval before touching any code.
-2. `/pyspec-execute <id>` — implements the approved spec.
-3. `/pyspec-verify <id>` — compares the spec against the actual diff
+2. `/pyspec:execute <id>` — implements the approved spec.
+3. `/pyspec:verify <id>` — compares the spec against the actual diff
    before the ticket is considered done.
-4. `/pyspec-archive <id>` — updates `specs/current/<module>.md` with what
+4. `/pyspec:archive <id>` — updates `specs/current/<module>.md` with what
    was actually implemented (adding `[sc-<id>]` to every new or modified
    line) and moves the spec to `archive/`.
 
@@ -102,6 +103,7 @@ This generates:
 
 ```bash
 pyspec init                          # configure this specs repo
+pyspec upgrade                       # re-generate the Claude Code commands after a pyspec update
 pyspec fetch <ticket-id>             # fetch a normalized ticket and print it
 pyspec new <ticket-id> [--modulo x]  # create specs/active/sc-<id>.spec from the template
 pyspec archive <ticket-id>           # move active/sc-<id>.spec to archive/
