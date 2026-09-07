@@ -10,10 +10,46 @@ from pyspec.config import PyspecConfig
 from pyspec.sources.base import Ticket
 
 SPECS_DIRS = ("current", "active", "archive")
+GITIGNORE_ENTRY = ".pyspec/"
 
 
 class SpecError(RuntimeError):
     pass
+
+
+def gitignore_path(config: PyspecConfig) -> Path:
+    return config.specs_root / ".gitignore"
+
+
+def is_pyspec_ignored(config: PyspecConfig) -> bool:
+    """Whether .gitignore (if any) already has a line ignoring .pyspec/."""
+    path = gitignore_path(config)
+    if not path.exists():
+        return False
+
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip().strip("/")
+        if stripped == ".pyspec":
+            return True
+    return False
+
+
+def append_pyspec_ignore(config: PyspecConfig) -> Path:
+    """Appends a .pyspec/ entry to an existing .gitignore."""
+    path = gitignore_path(config)
+    existing = path.read_text(encoding="utf-8")
+    separator = "" if existing.endswith("\n") else "\n"
+    addition = f"{separator}\n# pyspec: local config for this specs repo (never commit)\n{GITIGNORE_ENTRY}\n"
+    path.write_text(existing + addition, encoding="utf-8")
+    return path
+
+
+def create_gitignore_with_pyspec(config: PyspecConfig) -> Path:
+    """Creates a .gitignore with just the .pyspec/ entry."""
+    path = gitignore_path(config)
+    content = f"# pyspec: local config for this specs repo (never commit)\n{GITIGNORE_ENTRY}\n"
+    path.write_text(content, encoding="utf-8")
+    return path
 
 
 def specs_root(config: PyspecConfig) -> Path:

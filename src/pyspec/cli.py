@@ -101,6 +101,22 @@ def init(
     config.save()
     console.print(f"\n[green]OK[/green] Config saved to {config.config_path}")
 
+    if not scaffold.is_pyspec_ignored(config):
+        gitignore_file = scaffold.gitignore_path(config)
+        if gitignore_file.exists():
+            console.print(
+                f"\n[yellow]Warning:[/yellow] {gitignore_file} exists but doesn't "
+                "ignore .pyspec/ (it's local config, e.g. env var names — it shouldn't be committed)."
+            )
+            if typer.confirm("Add '.pyspec/' to it?", default=True):
+                scaffold.append_pyspec_ignore(config)
+                console.print(f"[green]OK[/green] Added .pyspec/ to {gitignore_file}")
+        else:
+            console.print(f"\n[yellow]Warning:[/yellow] No .gitignore found at {config.specs_root}.")
+            if typer.confirm("Create one ignoring '.pyspec/'?", default=True):
+                scaffold.create_gitignore_with_pyspec(config)
+                console.print(f"[green]OK[/green] Created {gitignore_file}")
+
     created = scaffold.ensure_structure(config)
     if created:
         console.print(f"[green]OK[/green] Structure created: {', '.join(p.name for p in created)}")
