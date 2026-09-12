@@ -81,7 +81,7 @@ It asks you for:
     quality gates before considering a ticket done.
   - **base branch** — used by `/pyspec:execute --auto-pr` to know what to
     branch off of and target the PR at.
-- **Coding agent**: only `claude-code` for now.
+- **Coding agent**: only `claude` for now.
 
 This generates:
 

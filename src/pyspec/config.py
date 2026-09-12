@@ -11,7 +11,8 @@ CONFIG_DIRNAME = ".pyspec"
 CONFIG_FILENAME = "config.yaml"
 
 SUPPORTED_SOURCES = ("trello", "shortcut", "manual")
-SUPPORTED_AGENTS = ("claude-code",)
+SUPPORTED_AGENTS = ("claude",)
+_LEGACY_AGENT_ALIASES = {"claude-code": "claude"}
 
 
 class ConfigNotFoundError(RuntimeError):
@@ -51,7 +52,7 @@ class PyspecConfig:
     specs_root: Path
     data_source: DataSourceConfig = field(default_factory=DataSourceConfig)
     repos: dict[str, RepoProfile] = field(default_factory=dict)
-    agent: str = "claude-code"
+    agent: str = "claude"
 
     @property
     def config_dir(self) -> Path:
@@ -122,11 +123,14 @@ class PyspecConfig:
                     base_branch=value.get("base_branch", ""),
                 )
 
+        agent_raw = raw.get("agent", "claude")
+        agent = _LEGACY_AGENT_ALIASES.get(agent_raw, agent_raw)
+
         return cls(
             specs_root=path.parent.parent,
             data_source=data_source,
             repos=repos,
-            agent=raw.get("agent", "claude-code"),
+            agent=agent,
         )
 
 

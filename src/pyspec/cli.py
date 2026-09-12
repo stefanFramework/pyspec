@@ -105,7 +105,7 @@ def init(
     agent = typer.prompt(
         "\nCoding agent to use",
         type=click.Choice(SUPPORTED_AGENTS),
-        default="claude-code",
+        default="claude",
     )
 
     config = PyspecConfig(
@@ -139,7 +139,7 @@ def init(
     else:
         console.print("[dim]The specs/current, active, archive structure already existed.[/dim]")
 
-    if agent == "claude-code":
+    if agent == "claude":
         written = claude_code.install(config)
         console.print(f"[green]OK[/green] Claude Code commands generated in .claude/commands/:")
         for p in written:
@@ -158,7 +158,7 @@ def upgrade() -> None:
     pyspec package to pick up template fixes/changes in an already-initialized repo."""
     config = _load_or_exit()
 
-    if config.agent != "claude-code":
+    if config.agent != "claude":
         console.print(f"[dim]Agent '{config.agent}' has no generated commands to upgrade.[/dim]")
         raise typer.Exit(code=0)
 
