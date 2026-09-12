@@ -15,6 +15,7 @@ from pyspec.config import (
     ConfigNotFoundError,
     DataSourceConfig,
     PyspecConfig,
+    RepoProfile,
     ShortcutConfig,
     TrelloConfig,
     load_config,
@@ -80,11 +81,26 @@ def init(
         console.print("\nNo integration: you'll paste the title and description by hand for each ticket.")
 
     console.print("\n[bold]Team repos[/bold] (path relative to this specs repo, leave empty if not applicable):")
-    repos = {}
+    repos: dict[str, RepoProfile] = {}
     for name in ("backend", "frontend", "infra"):
-        value = typer.prompt(f"  {name}", default="", show_default=False)
-        if value:
-            repos[name] = value
+        repo_path = typer.prompt(f"  {name} path", default="", show_default=False)
+        if not repo_path:
+            continue
+        stack = typer.prompt(
+            f"    {name} stack (optional, e.g. 'Python / pytest')", default="", show_default=False
+        )
+        test_command = typer.prompt(f"    {name} test command (optional)", default="", show_default=False)
+        lint_command = typer.prompt(f"    {name} lint command (optional)", default="", show_default=False)
+        base_branch = typer.prompt(
+            f"    {name} base branch (optional, e.g. 'main')", default="", show_default=False
+        )
+        repos[name] = RepoProfile(
+            path=repo_path,
+            stack=stack,
+            test_command=test_command,
+            lint_command=lint_command,
+            base_branch=base_branch,
+        )
 
     agent = typer.prompt(
         "\nCoding agent to use",

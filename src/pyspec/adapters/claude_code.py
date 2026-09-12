@@ -1,4 +1,4 @@
-"""Generates the Claude Code commands (/pyspec:explore, execute, verify, archive)
+"""Generates the Claude Code commands (/pyspec:explore, execute, verify, archive, run)
 from the packaged templates, parametrized with the repo's config."""
 
 from __future__ import annotations
@@ -7,17 +7,29 @@ import string
 from importlib import resources
 from pathlib import Path
 
-from pyspec.config import PyspecConfig
+from pyspec.config import PyspecConfig, RepoProfile
 
-COMMAND_NAMES = ("explore", "execute", "verify", "archive")
+COMMAND_NAMES = ("explore", "execute", "verify", "archive", "run")
+
+_REPO_NAMES = ("backend", "frontend", "infra")
+
+
+def _repo_mapping(config: PyspecConfig) -> dict[str, str]:
+    mapping: dict[str, str] = {}
+    for name in _REPO_NAMES:
+        profile = config.repos.get(name) or RepoProfile()
+        mapping[f"repo_{name}"] = profile.path or "(not configured)"
+        mapping[f"repo_{name}_stack"] = profile.stack or "(not specified)"
+        mapping[f"repo_{name}_test"] = profile.test_command or "(none configured)"
+        mapping[f"repo_{name}_lint"] = profile.lint_command or "(none configured)"
+        mapping[f"repo_{name}_base_branch"] = profile.base_branch or "(not configured)"
+    return mapping
 
 
 def _render(template_text: str, config: PyspecConfig) -> str:
     mapping = {
-        "repo_backend": config.repos.get("backend") or "(not configured)",
-        "repo_frontend": config.repos.get("frontend") or "(not configured)",
-        "repo_infra": config.repos.get("infra") or "(not configured)",
         "data_source": config.data_source.type,
+        **_repo_mapping(config),
     }
     return string.Template(template_text).safe_substitute(mapping)
 

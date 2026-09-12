@@ -71,11 +71,16 @@ It asks you for:
   ticket text by hand). For Trello/Shortcut, pyspec never stores
   credentials in the config — only the *name* of the environment
   variables you'll set them in (e.g. `TRELLO_API_KEY`, `TRELLO_TOKEN`).
-- **Repo paths** for the team (backend, frontend, infra), relative to the
-  specs repo. These are optional: for a single-repo setup, leave them
-  empty or fill in just one (e.g. `backend: .`) — they're only used to
-  parametrize the Claude Code commands, they don't change the rest of
-  pyspec's behavior.
+- **Repo profiles** for the team (backend, frontend, infra). Optional:
+  for a single-repo setup, leave them empty or fill in just one (e.g.
+  `backend: .`). For each repo you fill in a path, you're also asked
+  (all optional):
+  - **stack** — free text, e.g. `Python / pytest`, just context for the
+    agent.
+  - **test command** and **lint command** — run by `/pyspec:execute` as
+    quality gates before considering a ticket done.
+  - **base branch** — used by `/pyspec:execute --auto-pr` to know what to
+    branch off of and target the PR at.
 - **Coding agent**: only `claude-code` for now.
 
 This generates:
@@ -83,21 +88,34 @@ This generates:
 - `.pyspec/config.yaml` with the config (not versioned, see `.gitignore`).
 - `specs/current/`, `specs/active/`, `specs/archive/`.
 - `.claude/commands/pyspec/explore.md`, `execute.md`, `verify.md`,
-  `archive.md` — Claude Code commands parametrized with your repo
-  paths, exposed as `/pyspec:explore`, `/pyspec:execute`,
-  `/pyspec:verify`, `/pyspec:archive` (directory-based namespacing).
+  `archive.md`, `run.md` — Claude Code commands parametrized with your
+  repo profiles, exposed as `/pyspec:explore`, `/pyspec:execute`,
+  `/pyspec:verify`, `/pyspec:archive`, `/pyspec:run` (directory-based
+  namespacing).
 
 ### Ticket workflow
 
 1. `/pyspec:explore <id>` — Claude Code reads the ticket, reads
-   `current/` and the code, and writes `specs/active/sc-<id>.spec`. It
-   stops and explicitly asks for approval before touching any code.
-2. `/pyspec:execute <id>` — implements the approved spec.
+   `current/` and the code, and writes `specs/active/sc-<id>.spec`
+   (context, plan, acceptance criteria, and only the tests that add
+   real value — no tautological tests). It stops and explicitly asks
+   for approval before touching any code.
+2. `/pyspec:execute <id> [--auto-pr]` — implements the approved spec
+   test-first, runs each touched repo's configured quality gates, and
+   optionally (`--auto-pr`) branches, commits, pushes and opens a PR.
 3. `/pyspec:verify <id>` — compares the spec against the actual diff
-   before the ticket is considered done.
+   before the ticket is considered done, and writes a "Cómo probarla"
+   demo script.
 4. `/pyspec:archive <id>` — updates `specs/current/<module>.md` with what
    was actually implemented (adding `[sc-<id>]` to every new or modified
    line) and moves the spec to `archive/`.
+
+`/pyspec:run <id> [<id> ...] [--skip-permissions] [--auto-pr]` chains all
+four steps above for one or more tickets. By default it still stops to
+ask for plan approval on each ticket (same as running them one by one);
+pass `--skip-permissions` to let it go end-to-end unattended — useful
+when queuing up several tickets and stepping away. A ticket that gets
+blocked doesn't stop the rest of the queue.
 
 ### CLI commands
 

@@ -38,10 +38,19 @@ class DataSourceConfig:
 
 
 @dataclass
+class RepoProfile:
+    path: str = ""
+    stack: str = ""
+    test_command: str = ""
+    lint_command: str = ""
+    base_branch: str = ""
+
+
+@dataclass
 class PyspecConfig:
     specs_root: Path
     data_source: DataSourceConfig = field(default_factory=DataSourceConfig)
-    repos: dict[str, str] = field(default_factory=dict)
+    repos: dict[str, RepoProfile] = field(default_factory=dict)
     agent: str = "claude-code"
 
     @property
@@ -66,7 +75,16 @@ class PyspecConfig:
                     "token_env": self.data_source.shortcut.token_env,
                 },
             },
-            "repos": self.repos,
+            "repos": {
+                name: {
+                    "path": profile.path,
+                    "stack": profile.stack,
+                    "test_command": profile.test_command,
+                    "lint_command": profile.lint_command,
+                    "base_branch": profile.base_branch,
+                }
+                for name, profile in self.repos.items()
+            },
             "agent": self.agent,
         }
 
@@ -90,10 +108,24 @@ class PyspecConfig:
             shortcut=ShortcutConfig(**shortcut_raw) if shortcut_raw else ShortcutConfig(),
         )
 
+        repos: dict[str, RepoProfile] = {}
+        for name, value in (raw.get("repos", {}) or {}).items():
+            if isinstance(value, str):
+                # Legacy shape: repos used to be a plain name -> path mapping.
+                repos[name] = RepoProfile(path=value)
+            else:
+                repos[name] = RepoProfile(
+                    path=value.get("path", ""),
+                    stack=value.get("stack", ""),
+                    test_command=value.get("test_command", ""),
+                    lint_command=value.get("lint_command", ""),
+                    base_branch=value.get("base_branch", ""),
+                )
+
         return cls(
             specs_root=path.parent.parent,
             data_source=data_source,
-            repos=raw.get("repos", {}) or {},
+            repos=repos,
             agent=raw.get("agent", "claude-code"),
         )
 

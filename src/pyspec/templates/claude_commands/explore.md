@@ -25,16 +25,33 @@ Configured ticket data source: `$data_source`.
 3. Read `specs/current/<module>.md` for each relevant module. If it doesn't
    exist yet, generate it first by reading the current code (don't invent
    anything that isn't in the code). The configured repos are:
-   - backend: $repo_backend
-   - frontend: $repo_frontend
-   - infra: $repo_infra
+   - backend: $repo_backend ($repo_backend_stack)
+   - frontend: $repo_frontend ($repo_frontend_stack)
+   - infra: $repo_infra ($repo_infra_stack)
+   When the ticket touches more than one of these, fork one read-only
+   Explore subagent per repo, in a single message, so they run
+   concurrently instead of one after another.
 4. Read the backend/frontend/infra code relevant to the ticket's request.
-5. Run `pyspec new <ticket-id> --title "<ticket title>"` (using the ticket
+5. Draft the plan. If this session has a dedicated planning/thinking mode
+   available, use it for this step. Think test-first: work out the
+   acceptance criteria and which tests should drive the implementation
+   before deciding the technical approach.
+6. Run `pyspec new <ticket-id> --title "<ticket title>"` (using the ticket
    id from step 1) to create `specs/active/sc-<ticket-id>.spec` from the
    template.
-6. Fill in the spec with:
+7. Fill in the spec with:
    - Current context (summary of what `current/` says)
    - Step-by-step implementation plan
+   - **Acceptance criteria** — what "done" means, observable from outside.
+   - **Tests to write (specification)** — only tests that exercise real
+     business logic or a reachable behavioral branch (conditional
+     rendering, error/loading states, a bug's actual regression path, each
+     distinct outcome of a decision). Do NOT list a test just because it's
+     easy to write: no asserting a field merely exists on a model, no
+     pure type/constant checks, no asserting static copy that doesn't
+     depend on any branch, no near-duplicate of an existing test with only
+     cosmetic differences. When in doubt, fewer and higher-signal tests
+     beat more.
    - Files to touch (backend, frontend, infra as applicable)
    - Justification for ticket-specific technical decisions
 
